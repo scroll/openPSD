@@ -11,6 +11,7 @@ class openPSD(OMMPx.MPxNode):
         OMMPx.MPxNode.__init__(self)
 
     def compute(self, plug, dataBlock):
+        pass
 
 
 def nodeCreator():
