@@ -9,10 +9,8 @@ class openPSD(OMMPx.MPxNode):
     # constructor
     def __init__(self):
         OMMPx.MPxNode.__init__(self)
-        print '__init__'
 
     def compute(self, plug, dataBlock):
-        print ' compute '
 
 
 def nodeCreator():
@@ -28,9 +26,7 @@ def nodeInit():
 
 # initialize the plugin
 def initializePlugin(mobject):
-    print 'Initializing plugin'
     mplugin = OMMPx.MFnPlugin(mobject,'Marin&Slavi', '0.1', 'Any')
-    print 'Before try...'
     try:
         mplugin.registerNode(pluginName, nodeId, nodeCreator ,nodeInit)
 
