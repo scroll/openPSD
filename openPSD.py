@@ -44,3 +44,26 @@ def uninitializePlugin(mobject):
         sys.stderr.write( 'Failed to deregister node: %s' %pluginName)
         raise
 
+
+
+def computeWeight(angle, startOff, startOn, endOn, endOff, negateRange=False):
+    output = 0.0
+
+    if negateRange:
+        angle *= -1.0
+
+    if startOn <= angle <= endOn:
+        output = 1.0
+
+    elif startOff <= angle < startOn:
+        output = (angle - startOff) / (startOn - startOff)
+
+    elif endOn < angle <= endOff:
+        output = (angle - endOff) / (endOn - endOff)
+
+
+    return output
+
+
+
+
