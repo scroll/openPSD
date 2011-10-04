@@ -1,31 +1,31 @@
-import maya.OpenMaya as OM
-import maya.OpenMayaMPx as OMMPx
+import maya.OpenMaya as om
+import maya.OpenMayaMPx as ommpx
 import math
 
 pluginName = 'openPSD'
-nodeId = OM.MTypeId(0x101121)
+nodeId = om.MTypeId(0x101121)
 
 
 
-class openPSD(OMMPx.MPxNode):
+class openPSD(ommpx.MPxNode):
     def __init__(self):
-        OMMPx.MPxNode.__init__(self)
+        ompx.MPxNode.__init__(self)
 
     def compute(self, plug, dataBlock):
         if plug != openPSD.outAngle_uAttr and plug != openPSD.outTargetWeights_nAttr :
-            return OM.kUnknownParameter
+            return om.kUnknownParameter
 
 
-        baseMatrix_DH = OM.MDataHandle()
+        baseMatrix_DH = om.MDataHandle()
         baseMatrix_DH = dataBlock.inputValue(openPSD.baseMatrix_mAttr)
 	base_M = baseMatrix_DH.asMatrix()
 
-        driverMatrix_DH = OM.MDataHandle()
+        driverMatrix_DH = om.MDataHandle()
 	driverMatrix_DH = dataBlock.inputValue(openPSD.driverMatrix_mAttr)
 	driver_M = driverMatrix_DH.asMatrix()
 
         
-	baseAxisX_DH = OM.MDataHandle()
+	baseAxisX_DH = om.MDataHandle()
         baseAxisX_DH = data.inputValue(openPSD.baseAxisX_nAttr)
 
 	
@@ -45,40 +45,40 @@ class openPSD(OMMPx.MPxNode):
 	MDataHandle frontAxisZ_DH = data.inputValue(frontAxisZ_nAttr)
 
 	
-	MVector frontAxis_V = OM.MVector((frontAxisX_DH.asDouble(), frontAxisY_DH.asDouble(), frontAxisZ_DH.asDouble()))
+	MVector frontAxis_V = om.MVector((frontAxisX_DH.asDouble(), frontAxisY_DH.asDouble(), frontAxisZ_DH.asDouble()))
 
 
 def nodeCreator():
-    return OMMPx.asMPxPtr(openPSD())
+    return ompx.asMPxPtr(openPSD())
 
 def nodeInit():
-    nAttr = OM.MFnNumericAttribute()
-    mAttr = OM.MFnMatrixAttribute()
-    uAttr = OM.MFnUnitAttribute()
-    eAttr = OM.MFnEnumAttribute()
-    cAttr = OM.MFnCompountAttribute()
+    nAttr = om.MFnNumericAttribute()
+    mAttr = om.MFnMatrixAttribute()
+    uAttr = om.MFnUnitAttribute()
+    eAttr = om.MFnEnumAttribute()
+    cAttr = om.MFnCompountAttribute()
 
     # baseMatrix_mAttr
-    openPSD.baseMatrix_mAttr = mAttr.create("baseMatrix", "bm", OM.MFnMatrixAttribute.kDouble)
+    openPSD.baseMatrix_mAttr = mAttr.create("baseMatrix", "bm", om.MFnMatrixAttribute.kDouble)
     openPSD.addAttribute(openPSD.baseMatrix_mAttr)
 
 
     # driverMatrix_mAttr
-    openPSD.driverMatrix_mAttr = mAttr.create("driverMatrix", "dm", OM.MFnMatrixAttribute.kDouble)
+    openPSD.driverMatrix_mAttr = mAttr.create("driverMatrix", "dm", om.MFnMatrixAttribute.kDouble)
     openPSD.addAttribute(openPSD.driverMatrix_mAttr)
 
     # baseAxisX
-    openPSD.baseAxisX_nAttr = nAttr.create("baseAxisX", "hax", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.baseAxisX_nAttr = nAttr.create("baseAxisX", "hax", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.baseAxisX_nAttr)
 
     # baseAxisY
-    openPSD.baseAxisY_nAttr = nAttr.create("baseAxisY", "hay", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.baseAxisY_nAttr = nAttr.create("baseAxisY", "hay", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.baseAxisY_nAttr)
 
     # baseAxisZ
-    openPSD.baseAxisZ_nAttr = nAttr.create("baseAxisZ", "haz", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.baseAxisZ_nAttr = nAttr.create("baseAxisZ", "haz", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.baseAxisZ_nAttr)
 
@@ -88,17 +88,17 @@ def nodeInit():
     openPSD.addAttribute(openPSD.baseAxis_nAttr)
 
     # frontAxisX
-    openPSD.frontAxisX_nAttr = nAttr.create("frontAxisX", "fax", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.frontAxisX_nAttr = nAttr.create("frontAxisX", "fax", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.frontAxisX_nAttr)
 
     # frontAxisY
-    openPSD.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.frontAxisY_nAttr)
 
     # frontAxisZ
-    openPSD.frontAxisZ_nAttr = nAttr.create("frontAxisZ", "faz", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.frontAxisZ_nAttr = nAttr.create("frontAxisZ", "faz", om.MFnNumericData.kDouble, 0.0)
     nAttr.setKeyable(True)
     openPSD.addAttribute(openPSD.frontAxisZ_nAttr)
 
@@ -108,25 +108,25 @@ def nodeInit():
     openPSD.addAttribute(openPSD.frontAxis_nAttr)
 
     # startOff
-    openPSD.startOff_uAttr = uAttr.create("startOff", "sof", OM.MFnUnitAttribute.kAngle, 0.0)
+    openPSD.startOff_uAttr = uAttr.create("startOff", "sof", om.MFnUnitAttribute.kAngle, 0.0)
     uAttr.setMin(0.0)
     uAttr.setMax(math.pi)
     openPSD.addAttribute(openPSD.startOff_uAttr)
 
     # startOn
-    openPSD.startOn_uAttr = uAttr.create("startOn", "son", OM.MFnUnitAttribute.kAngle, math.pi * 0.25)
+    openPSD.startOn_uAttr = uAttr.create("startOn", "son", om.MFnUnitAttribute.kAngle, math.pi * 0.25)
     uAttr.setMin(0.0)
     uAttr.setMax(math.pi)
     openPSD.addAttribute(openPSD.startOn_uAttr)
 
     # endOn
-    openPSD.endOn_uAttr = uAttr.create("endOn", "eon", OM.MFnUnitAttribute.kAngle, math.pi * 0.5)
+    openPSD.endOn_uAttr = uAttr.create("endOn", "eon", om.MFnUnitAttribute.kAngle, math.pi * 0.5)
     uAttr.setMin(0.0)
     uAttr.setMax(math.pi)
     openPSD.addAttribute(openPSD.endOn_uAttr)
 
     # endOff
-    openPSD.endOff_uAttr = uAttr.create("endOff", "eof", OM.MFnUnitAttribute.kAngle, math.pi * 0.75)
+    openPSD.endOff_uAttr = uAttr.create("endOff", "eof", om.MFnUnitAttribute.kAngle, math.pi * 0.75)
     uAttr.setMin(0.0)
     uAttr.setMax(math.pi)
     openPSD.addAttribute(openPSD.endOff_uAttr)
@@ -142,14 +142,14 @@ def nodeInit():
     openPSD.addAttribute(openPSD.targetSettings_cAttr)
 
     # outAngle
-    openPSD.outAngle_uAttr = uAttr.create("outAngle", "oa", OM.MFnUnitAttribute.kAngle, 0.0)
+    openPSD.outAngle_uAttr = uAttr.create("outAngle", "oa", om.MFnUnitAttribute.kAngle, 0.0)
     uAttr.setWritable(False)
     uAttr.setStorable(False)
     openPSD.addAttribute(openPSD.outAngle_uAttr)
 
 
     # outTargetWeights
-    openPSD.outTargetWeights_nAttr = nAttr.create("outTargetWeights", "otw", OM.MFnNumericData.kDouble, 0.0)
+    openPSD.outTargetWeights_nAttr = nAttr.create("outTargetWeights", "otw", om.MFnNumericData.kDouble, 0.0)
     nAttr.setWritable(False)
     nAttr.setStorable(False)
     nAttr.setArray(True)
@@ -172,7 +172,7 @@ def nodeInit():
 
 # initialize the plugin
 def initializePlugin(mobject):
-    mplugin = OMMPx.MFnPlugin(mobject,'Marin&Slavi', '0.1', 'Any')
+    mplugin = ompx.MFnPlugin(mobject,'Marin&Slavi', '0.1', 'Any')
     try:
         mplugin.registerNode(pluginName, nodeId, nodeCreator ,nodeInit)
 
@@ -182,7 +182,7 @@ def initializePlugin(mobject):
 
 # uninitializePlugin
 def uninitializePlugin(mobject):
-    mplugin = OMMPx.MFnPlugin(mobject)
+    mplugin = ompx.MFnPlugin(mobject)
     try:
         mplugin.deregisterNode(nodeId)
     except:
