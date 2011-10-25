@@ -92,18 +92,18 @@ def nodeInit():
     angleReader.driverMatrix_mAttr = mAttr.create("driverMatrix", "dm", om.MFnMatrixAttribute.kDouble)
     angleReader.addAttribute(angleReader.driverMatrix_mAttr)
 
-    # baseAxisX
-    angleReader.baseAxisX_nAttr = nAttr.create("baseAxisX", "bax", om.MFnNumericData.kDouble, 1.0)
+    # baseAxisX  - this should be kDouble in C++
+    angleReader.baseAxisX_nAttr = nAttr.create("baseAxisX", "bax", om.MFnNumericData.kFloat, 1.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.baseAxisX_nAttr)
 
     # baseAxisY
-    angleReader.baseAxisY_nAttr = nAttr.create("baseAxisY", "bay", om.MFnNumericData.kDouble, 0.0)
+    angleReader.baseAxisY_nAttr = nAttr.create("baseAxisY", "bay", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.baseAxisY_nAttr)
 
     # baseAxisZ
-    angleReader.baseAxisZ_nAttr = nAttr.create("baseAxisZ", "baz", om.MFnNumericData.kDouble, 0.0)
+    angleReader.baseAxisZ_nAttr = nAttr.create("baseAxisZ", "baz", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.baseAxisZ_nAttr)
 
@@ -113,21 +113,21 @@ def nodeInit():
                                               angleReader.baseAxisX_nAttr,
                                               angleReader.baseAxisY_nAttr,
                                               angleReader.baseAxisZ_nAttr)
-    # nAttr.setDefault(1.0, 0.0, 0.0)
+    nAttr.setDefault(1.0, 0.0, 0.0)
     angleReader.addAttribute(angleReader.baseAxis_nAttr)
 
     # frontAxisX
-    angleReader.frontAxisX_nAttr = nAttr.create("frontAxisX", "fax", om.MFnNumericData.kDouble, 0.0)
+    angleReader.frontAxisX_nAttr = nAttr.create("frontAxisX", "fax", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.frontAxisX_nAttr)
 
     # frontAxisY
-    angleReader.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", om.MFnNumericData.kDouble, 0.0)
+    angleReader.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.frontAxisY_nAttr)
 
     # frontAxisZ
-    angleReader.frontAxisZ_nAttr = nAttr.create("frontAxisZ", "faz", om.MFnNumericData.kDouble, 0.0)
+    angleReader.frontAxisZ_nAttr = nAttr.create("frontAxisZ", "faz", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.frontAxisZ_nAttr)
 
@@ -137,7 +137,7 @@ def nodeInit():
                                                angleReader.frontAxisX_nAttr,
                                                angleReader.frontAxisY_nAttr,
                                                angleReader.frontAxisZ_nAttr)
-    # nAttr.setDefault(0.0, 1.0, 0.0)
+    nAttr.setDefault(0.0, 1.0, 0.0)
     angleReader.addAttribute(angleReader.frontAxis_nAttr)
 
 
