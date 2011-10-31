@@ -23,32 +23,96 @@ class angleReader(ompx.MPxLocatorNode):
         dataBlock.setClean(plug)
 
 
-#         if plug != angleReader.outAngle_uAttr and plug != angleReader.outWeights_nAttr :
-#             return om.kUnknownParameter
+        # if plug != angleReader.outAngle_uAttr and plug != angleReader.outWeight_nAttr :
+        #     return om.kUnknownParameter
 
 
-#         baseMatrix_DH = om.MDataHandle()
-#         baseMatrix_DH = dataBlock.inputValue(angleReader.baseMatrix_mAttr)
-#         base_M = baseMatrix_DH.asMatrix()
+        baseMatrix_DH = om.MDataHandle()
+        baseMatrix_DH = dataBlock.inputValue(angleReader.baseMatrix_mAttr)
+        base_M = baseMatrix_DH.asMatrix()
 
-#         driverMatrix_DH = om.MDataHandle()
-#         driverMatrix_DH = dataBlock.inputValue(angleReader.driverMatrix_mAttr)
-#         driver_M = driverMatrix_DH.asMatrix()
+        driverMatrix_DH = om.MDataHandle()
+        driverMatrix_DH = dataBlock.inputValue(angleReader.driverMatrix_mAttr)
+        driver_M = driverMatrix_DH.asMatrix()
 
-#         baseAxisX_DH = om.MDataHandle()
-#         baseAxisX_DH = data.inputValue(angleReader.baseAxisX_nAttr)
-#         baseAxisY_DH = om.MDataHandle()
-#         baseAxisY_DH = data.inputValue(angleReader.baseAxisY_nAttr)
-#         baseAxisZ_DH = om.MDataHandle()
-#         baseAxisZ_DH = data.inputValue(angleReader.baseAxisZ_nAttr)
-#         baseAxis_V = om.MVector(baseAxisX_DH.asDouble(), baseAxisY_DH.asDouble(), baseAxisZ_DH.asDouble())
+        rotateAxisX_DH = om.MDataHandle()
+        rotateAxisX_DH = dataBlock.inputValue(angleReader.rotateAxisX_nAttr)
+        rotateAxisY_DH = om.MDataHandle()
+        rotateAxisY_DH = dataBlock.inputValue(angleReader.rotateAxisY_nAttr)
+        rotateAxisZ_DH = om.MDataHandle()
+        rotateAxisZ_DH = dataBlock.inputValue(angleReader.rotateAxisZ_nAttr)
+        rotateAxis_V = om.MVector(rotateAxisX_DH.asFloat(), rotateAxisY_DH.asFloat(), rotateAxisZ_DH.asFloat())
+
+        print rotateAxis_V.x, rotateAxis_V.y, rotateAxis_V.z
 
 
-#         frontAxisX_DH = om.MDataHandle()
-#         frontAxisX_DH = data.inputValue(angleReader.frontAxisX_nAttr)
-#         frontAxisY_DH = data.inputValue(angleReader.frontAxisY_nAttr)
-#         frontAxisZ_DH = data.inputValue(angleReader.frontAxisZ_nAttr)
-#         MVector frontAxis_V = om.MVector((frontAxisX_DH.asDouble(), frontAxisY_DH.asDouble(), frontAxisZ_DH.asDouble()))
+        frontAxisX_DH = om.MDataHandle()
+        frontAxisX_DH = dataBlock.inputValue(angleReader.frontAxisX_nAttr)
+        frontAxisY_DH = om.MDataHandle()
+        frontAxisY_DH = dataBlock.inputValue(angleReader.frontAxisY_nAttr)
+        frontAxisZ_DH = om.MDataHandle()
+        frontAxisZ_DH = dataBlock.inputValue(angleReader.frontAxisZ_nAttr)
+        frontAxis_V = om.MVector(frontAxisX_DH.asFloat(), frontAxisY_DH.asFloat(), frontAxisZ_DH.asFloat())
+
+
+        # compute the angle
+        # baseTr_M = om.MTransformationMatrix(base_M)
+        # baseEuler = om.MEulerRotation(baseTr_M.eulerRotation())
+        # print baseEuler.x, baseEuler.y, baseEuler.z
+        # driverTr_M = om.MTransformationMatrix(driver_M)
+        # driverEuler = om.MEulerRotation(driverTr_M.eulerRotation())
+        # print driverEuler.x, driverEuler.y, driverEuler.z
+
+        # bx, by, bz = baseEuler.x , baseEuler.y, baseEuler.z
+        # dx, dy, dz = driverEuler.x, driverEuler.y, driverEuler.z
+
+        # if dx != 0.0:
+        #     rx = bx/dx
+        # else:
+        #     rx = 0.0
+
+        # if dy != 0.0:
+        #     ry = by/dy
+        # else:
+        #     ry = 0.0
+
+        # if dz != 0.0:
+        #     rz = bz/dz
+        # else:
+        #     rz = 0.0
+        
+        # resultRotation = om.MEulerRotation(rx, ry, rz)
+
+        
+        # print math.degrees(resultRotation.x), math.degrees(resultRotation.y), math.degrees(resultRotation.z)
+
+        # rotation_V = 
+
+
+        # first get the local axis of the matrices
+        driverFront_V = frontAxis_V * driver_M
+        driverFront_V.normalize()
+
+        print 'DriverFront_V: ', driverFront_V.x, driverFront_V.y, driverFront_V.z
+        baseRotate_V = rotateAxis_V * base_M
+        baseRotate_V.normalize()
+        baseFront_V = frontAxis_V * base_M
+        baseFront_V.normalize()
+
+        # then calculate the third axis for the baseMatrix
+        upAxis_V = baseRotate_V ^ baseFront_V
+        upAxis_V.normalize()
+
+        # then make a projection from driver's frontAxis to the base rotate vector
+        projected_V = driverFront_V ^ baseRotate_V
+        projected_V.normalize()
+
+        dotProjBaseFront = projected_V * baseFront_V
+        dotProjUp = projected_V * upAxis_V
+        rotation = math.degrees(math.atan2(dotProjBaseFront, dotProjUp))
+
+        print pluginName + ' : ' + str(rotation)
+        
 
 
     def draw( self, view, path, dispStyle, status ):
@@ -199,28 +263,28 @@ def nodeInit():
     angleReader.driverMatrix_mAttr = mAttr.create("driverMatrix", "dm", om.MFnMatrixAttribute.kDouble)
     angleReader.addAttribute(angleReader.driverMatrix_mAttr)
 
-    # baseAxisX  - this should be kDouble in C++
-    angleReader.baseAxisX_nAttr = nAttr.create("baseAxisX", "bax", om.MFnNumericData.kFloat, 1.0)
+    # rotateAxisX  - this should be kDouble in C++
+    angleReader.rotateAxisX_nAttr = nAttr.create("rotateAxisX", "rax", om.MFnNumericData.kFloat, 1.0)
     nAttr.setKeyable(True)
-    angleReader.addAttribute(angleReader.baseAxisX_nAttr)
+    angleReader.addAttribute(angleReader.rotateAxisX_nAttr)
 
-    # baseAxisY
-    angleReader.baseAxisY_nAttr = nAttr.create("baseAxisY", "bay", om.MFnNumericData.kFloat, 0.0)
+    # rotateAxisY
+    angleReader.rotateAxisY_nAttr = nAttr.create("rotateAxisY", "ray", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
-    angleReader.addAttribute(angleReader.baseAxisY_nAttr)
+    angleReader.addAttribute(angleReader.rotateAxisY_nAttr)
 
-    # baseAxisZ
-    angleReader.baseAxisZ_nAttr = nAttr.create("baseAxisZ", "baz", om.MFnNumericData.kFloat, 0.0)
+    # rotateAxisZ
+    angleReader.rotateAxisZ_nAttr = nAttr.create("rotateAxisZ", "raz", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
-    angleReader.addAttribute(angleReader.baseAxisZ_nAttr)
+    angleReader.addAttribute(angleReader.rotateAxisZ_nAttr)
 
-    # baseAxis
-    angleReader.baseAxis_nAttr = nAttr.create("baseAxis", "ba",
-                                              angleReader.baseAxisX_nAttr,
-                                              angleReader.baseAxisY_nAttr,
-                                              angleReader.baseAxisZ_nAttr)
+    # rotateAxis
+    angleReader.rotateAxis_nAttr = nAttr.create("rotateAxis", "ra",
+                                                angleReader.rotateAxisX_nAttr,
+                                                angleReader.rotateAxisY_nAttr,
+                                                angleReader.rotateAxisZ_nAttr)
     nAttr.setDefault(1.0, 0.0, 0.0)
-    angleReader.addAttribute(angleReader.baseAxis_nAttr)
+    angleReader.addAttribute(angleReader.rotateAxis_nAttr)
 
     # frontAxisX
     angleReader.frontAxisX_nAttr = nAttr.create("frontAxisX", "fax", om.MFnNumericData.kFloat, 0.0)
@@ -254,26 +318,23 @@ def nodeInit():
     angleReader.addAttribute(angleReader.outAngle_uAttr)
 
 
-    # outWeights
-    angleReader.outWeights_nAttr = nAttr.create("outWeights", "otw", om.MFnNumericData.kDouble, 0.0)
+    # outWeight
+    angleReader.outWeight_nAttr = nAttr.create("outWeight", "otw", om.MFnNumericData.kFloat, 0.0)
     nAttr.setWritable(False)
     nAttr.setStorable(False)
-    nAttr.setArray(True)
-    nAttr.setUsesArrayDataBuilder(True)
-    angleReader.addAttribute(angleReader.outWeights_nAttr)
+    angleReader.addAttribute(angleReader.outWeight_nAttr)
 
         
     # attributeAffects calls
     angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outAngle_uAttr)
     angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outAngle_uAttr)
-    angleReader.attributeAffects(angleReader.baseAxis_nAttr, angleReader.outAngle_uAttr)
+    angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outAngle_uAttr)
     angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outAngle_uAttr)
 
-    angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outWeights_nAttr)
-    angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outWeights_nAttr)
-    angleReader.attributeAffects(angleReader.baseAxis_nAttr, angleReader.outWeights_nAttr)
-    angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outWeights_nAttr)
-    # angleReader.attributeAffects(angleReader.inputSettings_cAttr, angleReader.outWeights_nAttr)
+    angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outWeight_nAttr)
 
 
 
