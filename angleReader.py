@@ -20,10 +20,11 @@ class angleReader(ompx.MPxLocatorNode):
 
 
     def compute(self, plug, dataBlock):
+        print 'computing'
         dataBlock.setClean(plug)
 
 
-        # if plug != angleReader.outAngle_uAttr and plug != angleReader.outWeight_nAttr :
+        # if plug != angleReader.outAngle_nAttr and plug != angleReader.outWeight_nAttr :
         #     return om.kUnknownParameter
 
 
@@ -43,7 +44,7 @@ class angleReader(ompx.MPxLocatorNode):
         rotateAxisZ_DH = dataBlock.inputValue(angleReader.rotateAxisZ_nAttr)
         rotateAxis_V = om.MVector(rotateAxisX_DH.asFloat(), rotateAxisY_DH.asFloat(), rotateAxisZ_DH.asFloat())
 
-        print rotateAxis_V.x, rotateAxis_V.y, rotateAxis_V.z
+#         print rotateAxis_V.x, rotateAxis_V.y, rotateAxis_V.z
 
 
         frontAxisX_DH = om.MDataHandle()
@@ -56,44 +57,12 @@ class angleReader(ompx.MPxLocatorNode):
 
 
         # compute the angle
-        # baseTr_M = om.MTransformationMatrix(base_M)
-        # baseEuler = om.MEulerRotation(baseTr_M.eulerRotation())
-        # print baseEuler.x, baseEuler.y, baseEuler.z
-        # driverTr_M = om.MTransformationMatrix(driver_M)
-        # driverEuler = om.MEulerRotation(driverTr_M.eulerRotation())
-        # print driverEuler.x, driverEuler.y, driverEuler.z
-
-        # bx, by, bz = baseEuler.x , baseEuler.y, baseEuler.z
-        # dx, dy, dz = driverEuler.x, driverEuler.y, driverEuler.z
-
-        # if dx != 0.0:
-        #     rx = bx/dx
-        # else:
-        #     rx = 0.0
-
-        # if dy != 0.0:
-        #     ry = by/dy
-        # else:
-        #     ry = 0.0
-
-        # if dz != 0.0:
-        #     rz = bz/dz
-        # else:
-        #     rz = 0.0
-        
-        # resultRotation = om.MEulerRotation(rx, ry, rz)
-
-        
-        # print math.degrees(resultRotation.x), math.degrees(resultRotation.y), math.degrees(resultRotation.z)
-
-        # rotation_V = 
-
 
         # first get the local axis of the matrices
         driverFront_V = frontAxis_V * driver_M
         driverFront_V.normalize()
 
-        print 'DriverFront_V: ', driverFront_V.x, driverFront_V.y, driverFront_V.z
+#         print 'DriverFront_V: ', driverFront_V.x, driverFront_V.y, driverFront_V.z
         baseRotate_V = rotateAxis_V * base_M
         baseRotate_V.normalize()
         baseFront_V = frontAxis_V * base_M
@@ -101,21 +70,25 @@ class angleReader(ompx.MPxLocatorNode):
 
         # then calculate the third axis for the baseMatrix
         upAxis_V = baseRotate_V ^ baseFront_V
-        upAxis_V.normalize()
 
         # then make a projection from driver's frontAxis to the base rotate vector
         projected_V = driverFront_V ^ baseRotate_V
-        projected_V.normalize()
-
         dotProjBaseFront = projected_V * baseFront_V
         dotProjUp = projected_V * upAxis_V
-        rotation = math.degrees(math.atan2(dotProjBaseFront, dotProjUp))
+        angle = math.degrees(math.atan2(dotProjBaseFront, dotProjUp))
+        mAngle = om.MAngle(angle, om.MAngle.kRadians)
 
-        print pluginName + ' : ' + str(rotation)
-        
+        outAngle_DH = om.MDataHandle()
+        outAngle_DH = dataBlock.outputValue(angleReader.outAngle_nAttr)
+        outAngle_DH.setMAngle(mAngle)
+        outAngle_DH.setClean()
+
+        print pluginName + ' : ' + str(angle)
+
 
 
     def draw( self, view, path, dispStyle, status ):
+        print 'drawing'
                 
         thisNode = self.thisMObject()
         plugDraw = om.MPlug(thisNode, self.draw_nAttr)
@@ -132,6 +105,9 @@ class angleReader(ompx.MPxLocatorNode):
         postEnd = plugPostEnd.asFloat()
         plugRadius = om.MPlug(thisNode, self.radius)
         radius = plugRadius.asFloat()
+        plugAngle = om.MPlug(thisNode, self.outAngle_nAttr)
+        angle = plugAngle.asMAngle()
+        print angle.asDegrees()
 
 
         if (draw == 0):
@@ -166,7 +142,7 @@ class angleReader(ompx.MPxLocatorNode):
         self.glFT.glEnd()
 
 
-        text = ("Angle : "+str(postEnd - preStart))
+        text = ("Angle : "+str(angle.asDegrees()))
         view.drawText(text,om.MPoint(0,0,0), omUI.M3dView().kLeft)
 
         self.glFT.glLineWidth(3)
@@ -311,11 +287,17 @@ def nodeInit():
     angleReader.addAttribute(angleReader.frontAxis_nAttr)
 
 
+#     # outAngle
+#     angleReader.outAngle_nAttr = nAttr.create("outAngle", "oa", om.MFnNumericData.kFloat, 0.0)
+#     nAttr.setWritable(False)
+#     nAttr.setStorable(False)
+#     angleReader.addAttribute(angleReader.outAngle_nAttr)
+
     # outAngle
-    angleReader.outAngle_uAttr = uAttr.create("outAngle", "oa", om.MFnUnitAttribute.kAngle, 0.0)
+    angleReader.outAngle_nAttr = uAttr.create("outAngle", "oa", om.MFnUnitAttribute.kAngle, 0.0)
     uAttr.setWritable(False)
     uAttr.setStorable(False)
-    angleReader.addAttribute(angleReader.outAngle_uAttr)
+    angleReader.addAttribute(angleReader.outAngle_nAttr)
 
 
     # outWeight
@@ -326,10 +308,10 @@ def nodeInit():
 
         
     # attributeAffects calls
-    angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outAngle_uAttr)
-    angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outAngle_uAttr)
-    angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outAngle_uAttr)
-    angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outAngle_uAttr)
+    angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outAngle_nAttr)
 
     angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outWeight_nAttr)
     angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outWeight_nAttr)
