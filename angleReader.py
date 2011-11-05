@@ -23,8 +23,8 @@ class angleReader(ompx.MPxLocatorNode):
         dataBlock.setClean(plug)
 
 
-        # if plug != angleReader.outAngle_nAttr and plug != angleReader.outWeight_nAttr :
-        #     return om.kUnknownParameter
+        if plug != angleReader.outAngle_nAttr and plug != angleReader.outWeight_nAttr :
+            return om.kUnknownParameter
 
 
         baseMatrix_DH = om.MDataHandle()
@@ -66,6 +66,10 @@ class angleReader(ompx.MPxLocatorNode):
         postEnd_DH = dataBlock.inputValue(angleReader.postEnd_nAttr)
         postEnd = postEnd_DH.asFloat()
 
+        negate_DH = om.MDataHandle()
+        negate_DH = dataBlock.inputValue(angleReader.negate_nAttr)
+        negate = negate_DH.asInt()
+
 
         # compute the angle
 
@@ -95,7 +99,7 @@ class angleReader(ompx.MPxLocatorNode):
         # print pluginName + ' : ' + str(angle)
         outWeight_DH = om.MDataHandle()
         outWeight_DH = dataBlock.outputValue(angleReader.outWeight_nAttr)
-        weight = computeWeight(math.degrees(angle), preStart, start, end, postEnd, negate=False)
+        weight = computeWeight(math.degrees(angle), preStart, start, end, postEnd, negate)
         outWeight_DH.setFloat(weight)
         outWeight_DH.setClean()
 
@@ -106,6 +110,7 @@ class angleReader(ompx.MPxLocatorNode):
                 
         thisNode = self.thisMObject()
         draw = om.MPlug(thisNode, self.draw_nAttr).asInt()
+        text = om.MPlug(thisNode, self.text_eAttr).asInt()
         segment = om.MPlug(thisNode, self.segment_nAttr).asInt()
         preStart = om.MPlug(thisNode, self.preStart_nAttr).asFloat()
         start = om.MPlug(thisNode, self.start_nAttr).asFloat()
@@ -113,14 +118,40 @@ class angleReader(ompx.MPxLocatorNode):
         postEnd = om.MPlug(thisNode, self.postEnd_nAttr).asFloat()
         radius = om.MPlug(thisNode, self.radius).asFloat()
         angle = om.MPlug(thisNode, self.outAngle_nAttr).asMAngle()
+        weight = om.MPlug(thisNode, self.outWeight_nAttr).asFloat()
+        rotateX = om.MPlug(thisNode, self.rotateAxisX_nAttr).asFloat()
+        rotateY = om.MPlug(thisNode, self.rotateAxisY_nAttr).asFloat()
+        rotateZ = om.MPlug(thisNode, self.rotateAxisZ_nAttr).asFloat()
+        frontX = om.MPlug(thisNode, self.frontAxisX_nAttr).asFloat()
+        frontY = om.MPlug(thisNode, self.frontAxisY_nAttr).asFloat()
+        frontZ = om.MPlug(thisNode, self.frontAxisZ_nAttr).asFloat()
+        negate = om.MPlug(thisNode, self.negate_nAttr).asInt()
 
+        flip = 1
+        if negate == 1:
+            flip = -1
+
+        if rotateX == 1.0:
+            rotate = (90.0*flip, 90.0*flip, 0.0)
+        elif rotateY == 1.0:
+            rotate = (-90.0*flip, 0.0, 0.0)
+        elif rotateZ == 1.0:
+            rotate = (0.0, 0.0, 90.0*flip)
+        else:
+            rotate = (0.0, 0.0, 0.0)
 
 
         if (draw == 0):
-            return
+            return om.kUnknownParameter
 
 
         view.beginGL()  
+
+
+        self.glFT.glPushMatrix()
+        self.glFT.glRotatef(rotate[0],1.0,0.0,0.0)
+        self.glFT.glRotatef(rotate[1],0.0,1.0,0.0)
+        self.glFT.glRotatef(rotate[2],0.0,0.0,1.0)
 
         self.glFT.glPushAttrib(omRender.MGL_CURRENT_BIT | omRender.MGL_POINT_BIT | omRender.MGL_LINE_BIT)
         self.glFT.glBegin(omRender.MGL_LINE_STRIP)
@@ -148,8 +179,12 @@ class angleReader(ompx.MPxLocatorNode):
         self.glFT.glEnd()
 
 
-        text = ("Angle : "+str(angle.asDegrees()))
-        view.drawText(text,om.MPoint(0,0,0), omUI.M3dView().kLeft)
+        # textFields = {'Weight':weight, 'Angle':angle.asDegrees()}
+        textFields = ['Weight', 'Angle']
+        valueFields = [weight, angle.asDegrees()]
+        if text != 2:
+            txt = ("%s : %.5f"%(textFields[text], valueFields[text]))
+            view.drawText(txt,om.MPoint(0,0,0), omUI.M3dView().kLeft)
 
         self.glFT.glLineWidth(3)
         self.glFT.glColor3f(1,0,0)
@@ -158,30 +193,31 @@ class angleReader(ompx.MPxLocatorNode):
         x = radius * math.cos(start_ang)
         y = radius * math.sin(start_ang)
 
-        self.glFT.glVertex3d(x*1.05, y*1.05, 0.0)
-        self.glFT.glVertex3d(x*0.95, y*0.95, 0.0)
+        self.glFT.glVertex3d(x*1.06, y*1.06, 0.0)
+        self.glFT.glVertex3d(x*0.94, y*0.94, 0.0)
 
         x = radius * math.cos(math.radians(preStart))
         y = radius * math.sin(math.radians(preStart))
 
-        self.glFT.glVertex3d(x*1.05, y*1.05, 0.0)
-        self.glFT.glVertex3d(x*0.95, y*0.95, 0.0)
+        self.glFT.glVertex3d(x*1.06, y*1.06, 0.0)
+        self.glFT.glVertex3d(x*0.94, y*0.94, 0.0)
 
         x = radius * math.cos(math.radians(start))
         y = radius * math.sin(math.radians(start))
 
-        self.glFT.glVertex3d(x*1.05, y*1.05, 0.0)
-        self.glFT.glVertex3d(x*0.95, y*0.95, 0.0)
+        self.glFT.glVertex3d(x*1.04, y*1.04, 0.0)
+        self.glFT.glVertex3d(x*0.96, y*0.96, 0.0)
 
         x = radius * math.cos(math.radians(end))
         y = radius * math.sin(math.radians(end))
 
-        self.glFT.glVertex3d(x*1.05, y*1.05, 0.0)
-        self.glFT.glVertex3d(x*0.95, y*0.95, 0.0)
+        self.glFT.glVertex3d(x*1.04, y*1.04, 0.0)
+        self.glFT.glVertex3d(x*0.96, y*0.96, 0.0)
 
         self.glFT.glEnd()
         self.glFT.glLineWidth(1.0);
         self.glFT.glPopAttrib()
+        self.glFT.glPopMatrix()
         view.endGL()
 
 
@@ -205,13 +241,31 @@ def nodeInit():
     angleReader.draw_nAttr = nAttr.create("draw", "drw", om.MFnNumericData.kBoolean, 1)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.draw_nAttr)
+
+    # text
+    angleReader.text_eAttr = eAttr.create("text", "txt", 0)
+    eAttr.setKeyable(True)
+    eAttr.addField("weight", 0)
+    eAttr.addField("angle", 1)
+    eAttr.addField("none", 2)
+    angleReader.addAttribute(angleReader.text_eAttr)
+
+    # radius
+    angleReader.radius = nAttr.create("radius", "rad", om.MFnNumericData.kFloat, 2.0)
+    nAttr.setKeyable(True)
+    angleReader.addAttribute( angleReader.radius )
         
     # segment
     angleReader.segment_nAttr = nAttr.create("segment", "seg", om.MFnNumericData.kInt, 9)
     nAttr.setKeyable(True)
     nAttr.setMin(2)
     angleReader.addAttribute(angleReader.segment_nAttr)
-        
+
+    # negate
+    angleReader.negate_nAttr = nAttr.create("negate", "neg", om.MFnNumericData.kBoolean, 0)
+    nAttr.setKeyable(True)
+    angleReader.addAttribute(angleReader.negate_nAttr)
+
     # preStart
     angleReader.preStart_nAttr = nAttr.create("preStart", "pre", om.MFnNumericData.kFloat, 0.0)
     nAttr.setKeyable(True)
@@ -231,11 +285,6 @@ def nodeInit():
     angleReader.postEnd_nAttr = nAttr.create("postEnd", "sta", om.MFnNumericData.kFloat, 180.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute( angleReader.postEnd_nAttr )
-        
-    # radius
-    angleReader.radius = nAttr.create("radius", "rad", om.MFnNumericData.kFloat, 2.0)
-    nAttr.setKeyable(True)
-    angleReader.addAttribute( angleReader.radius )
         
     # baseMatrix_mAttr
     angleReader.baseMatrix_mAttr = mAttr.create("baseMatrix", "bm", om.MFnMatrixAttribute.kDouble)
@@ -274,7 +323,7 @@ def nodeInit():
     angleReader.addAttribute(angleReader.frontAxisX_nAttr)
 
     # frontAxisY
-    angleReader.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", om.MFnNumericData.kFloat, 0.0)
+    angleReader.frontAxisY_nAttr = nAttr.create("frontAxisY", "fay", om.MFnNumericData.kFloat, 1.0)
     nAttr.setKeyable(True)
     angleReader.addAttribute(angleReader.frontAxisY_nAttr)
 
@@ -318,11 +367,19 @@ def nodeInit():
     angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outAngle_nAttr)
     angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outAngle_nAttr)
     angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.preStart_nAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.start_nAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.end_nAttr, angleReader.outAngle_nAttr)
+    angleReader.attributeAffects(angleReader.postEnd_nAttr, angleReader.outAngle_nAttr)
 
     angleReader.attributeAffects(angleReader.baseMatrix_mAttr, angleReader.outWeight_nAttr)
     angleReader.attributeAffects(angleReader.driverMatrix_mAttr, angleReader.outWeight_nAttr)
     angleReader.attributeAffects(angleReader.rotateAxis_nAttr, angleReader.outWeight_nAttr)
     angleReader.attributeAffects(angleReader.frontAxis_nAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.preStart_nAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.start_nAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.end_nAttr, angleReader.outWeight_nAttr)
+    angleReader.attributeAffects(angleReader.postEnd_nAttr, angleReader.outWeight_nAttr)
 
 
 
