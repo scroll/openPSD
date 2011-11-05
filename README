@@ -1,0 +1,6 @@
+This is an open source project for corrective blendshape workflow. 
+
+
+The name PSD refers to Pose Space Deformer, but in this case this is not a real PSD. It is more a workflow for 
+using the native blendshape maya node in order to achieve the same end result as in PSD workflow. That way we are 
+not using any external nodes for deforming the skinned geometry. 
