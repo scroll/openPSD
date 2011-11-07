@@ -3,16 +3,16 @@ Description:
     This script is used to install an angleReader node based on selection.
     The first selected item will be used as base and the second as driver.
 
-Authors:
-    Marin Petrov
-    www.scroll-lock.eu
-
 Arguments:
     rotateAxis(optional = [1,0,0]) - The axis that will be read by the angleReader.
     frontAxis(optional = [0,1,0]) - The front axis that will be used by the angleReader.
 
 Output:
     Tuple (angleReaderTransform, angleReaderShape)
+
+Authors:
+    Marin Petrov
+    www.scroll-lock.eu
 '''
 
 
