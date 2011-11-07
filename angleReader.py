@@ -1,3 +1,17 @@
+'''
+Description:
+    Maya Python plugin for creating an angleReader node.
+    The angleReader node can be used to drive corrective blendshapes based on
+    rotation between two transforms. Only one axis will be read by the angleReader,
+    which can be specified in the angleReader's shape attributes.   
+
+Authors:
+    Marin Petrov (www.scroll-lock.eu)
+    Alexander Tyemirov (www.tyemirov.blogspot.com)
+
+'''
+
+
 import math
 import sys
 import maya.OpenMaya as om
@@ -179,7 +193,6 @@ class angleReader(ompx.MPxLocatorNode):
         self.glFT.glEnd()
 
 
-        # textFields = {'Weight':weight, 'Angle':angle.asDegrees()}
         textFields = ['Weight', 'Angle']
         valueFields = [weight, angle.asDegrees()]
         if text != 2:
@@ -342,12 +355,6 @@ def nodeInit():
     angleReader.addAttribute(angleReader.frontAxis_nAttr)
 
 
-#     # outAngle
-#     angleReader.outAngle_nAttr = nAttr.create("outAngle", "oa", om.MFnNumericData.kFloat, 0.0)
-#     nAttr.setWritable(False)
-#     nAttr.setStorable(False)
-#     angleReader.addAttribute(angleReader.outAngle_nAttr)
-
     # outAngle
     angleReader.outAngle_nAttr = uAttr.create("outAngle", "oa", om.MFnUnitAttribute.kAngle, 0.0)
     uAttr.setWritable(False)
@@ -385,7 +392,7 @@ def nodeInit():
 
 # initialize the plugin
 def initializePlugin(mobject):
-    mplugin = ompx.MFnPlugin(mobject,'Marin&Alex', '0.1', 'Any')
+    mplugin = ompx.MFnPlugin(mobject,'Marin&Alex', '1.0', 'Any')
     try:
         mplugin.registerNode(pluginName, nodeId, nodeCreator ,nodeInit,ompx.MPxNode.kLocatorNode)
 
