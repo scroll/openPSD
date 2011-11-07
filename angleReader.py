@@ -13,7 +13,6 @@ Authors:
 
 
 import math
-import sys
 import maya.OpenMaya as om
 import maya.OpenMayaMPx as ompx
 import maya.OpenMayaRender as omRender
