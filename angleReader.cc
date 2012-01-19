@@ -13,7 +13,7 @@ Authors:
 
 #include "angleReader.h"
 
-const MString angleReader::nodeName("bssSpine");
+const MString angleReader::nodeName("angleReader");
 const MTypeId angleReader::nodeId(0x101121)
 
 
