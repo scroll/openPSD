@@ -4,32 +4,36 @@
 #include <maya/MFnPlugin.h>
 #include <maya/MGlobal.h>
 
-#include <maya/MPxNode.h>
+#include <maya/MPxLocatorNode.h>
+#include <maya/MBoundingBox.h>
 
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnMatrixAttribute.h>
+#include <maya/MFnTypedAttribute.h>
 #include <maya/MFnUnitAttribute.h>
+#include <maya/MFnEnumAttribute.h>
 #include <maya/MFnCompoundAttribute.h>
 
 #include <maya/M3dView.h>
 
+#include <maya/MString.h> 
 #include <maya/MVector.h>
 #include <maya/MMatrix.h>
 #include <maya/MAngle.h>
 
-// CHECK_STAT Macro
-#ifndef CHECK_STAT
-#define CHECK_STAT(STAT, MSG)\
-if(!STAT){\
-    MGlobal::displayError(MString(MSG) + " --- " + STAT.errorString());\
-}
-#endif
+#include <maya/MTypes.h>
+#include <maya/MTypeId.h> 
+#include <maya/MPlug.h>
+#include <maya/MDataBlock.h>
+#include <maya/MDataHandle.h>
 
-class angleReader : public MPxNode {
+
+
+class angleReader : public MPxLocatorNode {
 public:
     // Methods
-/*     angleReader(); */
-/*     virtual ~angleReader(); */
+    angleReader();
+    virtual ~angleReader();
 
     virtual MStatus compute(const MPlug& plug,
 			    MDataBlock& data);
@@ -39,45 +43,52 @@ public:
 		      M3dView::DisplayStyle dispStyle,
 		      M3dView::DisplayStatus displayStat);
 
-    static double computeWeight(double& angle,
-				double& preStart,
-				double& start,
-				bool negate);
 
     virtual bool isBounded() const;
+    virtual MBoundingBox boundingBox() const;
 
 
     static void *creator();
+    static MTypeId nodeId;
+    static MString nodeName;
     static MStatus initialize();
-    static const MTypeId nodeId;
-    static const MString nodeName;
 
     //Data members
-    static MObject aDraw_nAttr;
-    static MObject aText_eAttr;
-    static MObject aRadius_nAttr;
-    static MObject aSegment_nAttr;
-    static MObject aNegate_nAttr;
-    static MObject aPreStart_nAttr;
-    static MObject aStart_nAttr;
-    static MObject aEnd_nAttr;
-    static MObject aPostEnd_nAttr;
+    static MObject draw_nAttr;
+    static MObject text_eAttr;
+    static MObject radius_nAttr;
+    static MObject segment_nAttr;
+    static MObject negate_nAttr;
+    static MObject preStart_uAttr;
+    static MObject start_uAttr;
+    static MObject end_uAttr;
+    static MObject postEnd_uAttr;
 
-    static MObject aBaseMatrix_mAttr;
-    static MObject aDriverMatrix_mAttr;
+    static MObject baseMatrix_mAttr;
+    static MObject driverMatrix_mAttr;
 
-    static MObject aRotateAxisX_nAttr;
-    static MObject aRotateAxisY_nAttr;
-    static MObject aRotateAxisZ_nAttr;
-    static MObject aRotateAxis_nAttr;
+    static MObject rotateAxisX_nAttr;
+    static MObject rotateAxisY_nAttr;
+    static MObject rotateAxisZ_nAttr;
+    static MObject rotateAxis_nAttr;
 
-    static MObject aFrontAxisX_nAttr;
-    static MObject aFrontAxisY_nAttr;
-    static MObject aFrontAxisZ_nAttr;
-    static MObject aFrontAxis_nAttr;
+    static MObject frontAxisX_nAttr;
+    static MObject frontAxisY_nAttr;
+    static MObject frontAxisZ_nAttr;
+    static MObject frontAxis_nAttr;
 
-    static MObject aOutAngle_uAttr;
-    static MObject aOutWeight_nAttr;
+    static MObject outAngle_uAttr;
+    static MObject outWeight_nAttr;
+
+private:    
+    static double computeWeight(double& angle,
+				double& preStart,
+				double& start,
+				double& end,
+				double& postEnd,
+				bool negate);
+
+};
 
 
 #endif
