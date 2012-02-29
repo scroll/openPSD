@@ -478,7 +478,7 @@ MStatus initializePlugin( MObject obj ){
 
 	CHECK_MSTATUS(plugin.registerNode(angleReader::nodeName, angleReader::nodeId, 
                                       &angleReader::creator, &angleReader::initialize,
-                                      MPxNode::kDependNode));
+                                      MPxNode::kLocatorNode));
 
 	return MS::kSuccess;
 }
