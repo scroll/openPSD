@@ -36,10 +36,8 @@ MObject angleReader::frontAxis_nAttr;
 MObject angleReader::outAngle_uAttr;
 MObject angleReader::outWeight_nAttr;
 
-const MString angleReader::nodeName("angleReader");
-const MTypeId angleReader::nodeId(0x101121)
-
-
+MString angleReader::nodeName("angleReader");
+MTypeId angleReader::nodeId(0x101121);
 
 // // constructor
 angleReader::angleReader() {}
@@ -52,8 +50,6 @@ void* angleReader::creator(){
     return new angleReader();
 }
 
-MString angleReader::nodeName("angleReader");
-MTypeId angleReader::nodeId(0x101121);
 
 // initialize 
 MStatus angleReader::initialize() {
