@@ -13,6 +13,7 @@ Authors:
 
 #include "angleReader.h"
 
+
 MObject angleReader::draw_nAttr;
 MObject angleReader::text_eAttr;
 MObject angleReader::radius_nAttr;
@@ -34,6 +35,10 @@ MObject angleReader::frontAxisZ_nAttr;
 MObject angleReader::frontAxis_nAttr;
 MObject angleReader::outAngle_uAttr;
 MObject angleReader::outWeight_nAttr;
+
+const MString angleReader::nodeName("angleReader");
+const MTypeId angleReader::nodeId(0x101121)
+
 
 
 // // constructor
