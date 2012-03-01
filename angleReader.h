@@ -45,8 +45,6 @@ public:
 
 
     virtual bool isBounded() const;
-    virtual MBoundingBox boundingBox() const;
-
 
     static void *creator();
     static MTypeId nodeId;
