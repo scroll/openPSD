@@ -175,13 +175,7 @@ MStatus angleReader::initialize() {
     CHECK_MSTATUS(addAttribute(postEnd_uAttr));
     CHECK_MSTATUS(addAttribute(baseMatrix_mAttr));
     CHECK_MSTATUS(addAttribute(driverMatrix_mAttr));
-    CHECK_MSTATUS(addAttribute(rotateAxisX_nAttr));
-    CHECK_MSTATUS(addAttribute(rotateAxisY_nAttr));
-    CHECK_MSTATUS(addAttribute(rotateAxisZ_nAttr));
     CHECK_MSTATUS(addAttribute(rotateAxis_nAttr));
-    CHECK_MSTATUS(addAttribute(frontAxisX_nAttr));
-    CHECK_MSTATUS(addAttribute(frontAxisY_nAttr));
-    CHECK_MSTATUS(addAttribute(frontAxisZ_nAttr));
     CHECK_MSTATUS(addAttribute(frontAxis_nAttr));
     CHECK_MSTATUS(addAttribute(outAngle_uAttr));
     CHECK_MSTATUS(addAttribute(outWeight_nAttr));
