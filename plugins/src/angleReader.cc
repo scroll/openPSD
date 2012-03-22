@@ -340,12 +340,12 @@ void angleReader::draw(M3dView& view,
     double rotateAxisY_d = rotateAxisYPlug.asDouble();
     MPlug rotateAxisZPlug(thisNode, rotateAxisZ_nAttr);
     double rotateAxisZ_d = rotateAxisZPlug.asDouble();
-    MPlug frontAxisXPlug(thisNode, frontAxisX_nAttr);
-    double frontAxisX_d = frontAxisXPlug.asDouble();
-    MPlug frontAxisYPlug(thisNode, frontAxisY_nAttr);
-    double frontAxisY_d = frontAxisYPlug.asDouble();
-    MPlug frontAxisZPlug(thisNode, frontAxisZ_nAttr);
-    double frontAxisZ_d = frontAxisZPlug.asDouble();
+    // MPlug frontAxisXPlug(thisNode, frontAxisX_nAttr);
+    // double frontAxisX_d = frontAxisXPlug.asDouble();
+    // MPlug frontAxisYPlug(thisNode, frontAxisY_nAttr);
+    // double frontAxisY_d = frontAxisYPlug.asDouble();
+    // MPlug frontAxisZPlug(thisNode, frontAxisZ_nAttr);
+    // double frontAxisZ_d = frontAxisZPlug.asDouble();
     MPlug negatePlug(thisNode, negate_nAttr);
     bool negate_b = negatePlug.asBool();
 
