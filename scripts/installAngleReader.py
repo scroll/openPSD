@@ -25,22 +25,30 @@ if not mc.pluginInfo('angleReader', q=True,  loaded=True):
 
 
 
-def installAngleReader(rotateAxis=[1,0,0], frontAxis=[0,1,0]):
+def installAngleReader(name, rotateAxis=[1,0,0], frontAxis=[0,1,0]):
     sel = mc.ls(sl=True)
     if len(sel) != 2:
         raise RuntimeError, 'Please select 2 transforms as base and driver in order to install angleReader'
 
     base, driver = sel
+    if not name:
+        raise RuntimeError, 'No name specified'
+    else:
+        baseName = '%s%sBaseGrp' %(base,name)
+        driverName = '%s%sDriverGrp' %(driver,name)
+        readerName = '%s%sReader' %(driver,name)
+        shapeName = '%s%sReaderShape' %(driver,name)
+    
 
     # create the angleReader node
-    readerShape = mc.createNode('angleReader', n=base+'ReaderShape')
+    readerShape = mc.createNode('angleReader', n=shapeName)
     reader = mc.listRelatives(readerShape, p=True)
-    mc.rename(reader, base+'Reader')
+    mc.rename(reader, readerName)
     print reader
 
     # create two transforms that will be used as input for the reader's matrices
-    baseGrp = mc.createNode('transform', n=base+'ReaderGrp')
-    driverGrp = mc.createNode('transform', n=driver+'ReaderGrp')
+    baseGrp = mc.createNode('transform', n=baseName)
+    driverGrp = mc.createNode('transform', n=driverName)
 
     # snap the reader to the driver's position and parent it to the base
     driverPos = mc.xform(driver, m=True, ws=True, q=True)
